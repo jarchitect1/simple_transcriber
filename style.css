@@ -99,6 +99,14 @@
             display: flex;
             align-items: center;
             gap: 15px;
+            border: 2px dashed #cbd5e1;
+            border-radius: 8px;
+            padding: 20px;
+            transition: border-color 0.2s;
+        }
+
+        .file-upload-wrapper.dragging {
+            border-color: var(--primary);
         }
 
         .file-upload-label {
