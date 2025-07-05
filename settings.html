@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Audio Transcription & AI Processor</title>
+    <meta name="theme-color" content="#2563eb">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Audio Transcription & AI Processor</h1>
+        <nav>
+            <a href="index.html">Home</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        <!-- Settings Panel -->
+        <div class="panel">
+            <h2 class="panel-title">⚙️ Settings</h2>
+            <div class="form-group">
+                <label for="apiKey">Firework API Key</label>
+                <div class="password-wrapper">
+                    <input type="password" id="FW-apiKey" placeholder="Enter your Firework API key">
+                    <button type="button" class="toggle-password">👁️</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="FW-model">Firework Model</label>
+                <input type="text" id="FW-model" placeholder="e.g., whisper-v3-turbo">
+            </div>
+            <div class="form-group">
+                <label for="FW-apiUrl">Firework API URL</label>
+                <input type="text" id="FW-apiUrl" value="https://audio-turbo.us-virginia-1.direct.fireworks.ai/v1">
+            </div>
+            <div class="form-group">
+                <label for="Opn-apiKey">OpenAI Compatible API Key</label>
+                <div class="password-wrapper">
+                    <input type="password" id="Opn-apiKey" placeholder="Enter your AI API key">
+                    <button type="button" class="toggle-password">👁️</button>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="Opn-model">OpenAI Compatible Model</label>
+                <input type="text" id="Opn-model" placeholder="e.g., google/gemini-2.5-flash">
+            </div>
+            <div class="form-group">
+                <label for="Opn-apiUrl">OpenAI Compatible API URL</label>
+                <input type="text" id="Opn-apiUrl" value="https://openrouter.ai/api/v1">
+            </div>
+            <div class="form-group">
+                <label for="language">Language</label>
+                <select id="language">
+                    <option value="auto">Auto Detect</option>
+                    <option value="en">English</option>
+                    <option value="zh">Chinese</option>
+                    <option value="id">Indonesian</option>
+                    <option value="ms">Malay</option>
+                    <option value="th">Thai</option>
+                    <option value="vi">Vietnamese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="yue">Cantonese</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                </select>
+            </div>
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="diarize">
+                <label for="diarize">Speaker Diarization</label>
+            </div>
+            <!-- Prompt Settings -->
+            <div class="form-group">
+                <label for="proofread">Proofread Prompt</label>
+                <textarea id="proofread" rows="3" placeholder="Enter proofread prompt">Proofread and correct this text. Fix grammar, punctuation, and spelling. Keep the meaning the same. Make it clear, concise, and coherent.</textarea>
+            </div>
+            <div class="form-group">
+                <label for="minutes">Minutes Prompt</label>
+                <textarea id="minutes" rows="3" placeholder="Enter minutes prompt">Convert the transcript into meeting minutes. Structure the minutes with a clear agenda, discussion points, decisions, and action items. Use bullet points.</textarea>
+            </div>
+            <div class="form-group">
+                <label for="summary">Summary Prompt</label>
+                <textarea id="summary" rows="3" placeholder="Enter summary prompt">Summarize the transcript. Capture the main points, key arguments, and conclusions. Keep it brief and to the point.</textarea>
+            </div>
+            <div class="form-group">
+                <label for="outline">Outline Prompt</label>
+                <textarea id="outline" rows="3" placeholder="Enter outline prompt">Create a structured outline from the transcript. Break down the content into sections, subsections, and bullet points. Include headings and subheadings.</textarea>
+            </div>
+            <button id="saveSettings">Save Settings</button>
+            <div class="btn-group">
+                <button id="exportSettings">Export Settings</button>
+                <button id="importSettings">Import Settings</button>
+                <input type="file" id="importFile" accept=".json" style="display: none">
+            </div>
+            <div id="settingsStatus" class="status"></div>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Audio Transcription & AI Processor PWA | All processing happens securely via OpenAI API</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const elements = {
+                'FW-apiKey': document.getElementById('FW-apiKey'),
+                'FW-model': document.getElementById('FW-model'),
+                'FW-apiUrl': document.getElementById('FW-apiUrl'),
+                'Opn-apiKey': document.getElementById('Opn-apiKey'),
+                'Opn-model': document.getElementById('Opn-model'),
+                'Opn-apiUrl': document.getElementById('Opn-apiUrl'),
+                'saveSettings': document.getElementById('saveSettings'),
+                'settingsStatus': document.getElementById('settingsStatus'),
+                'language': document.getElementById('language'),
+                'diarize': document.getElementById('diarize'),
+                'proofread': document.getElementById('proofread'),
+                'minutes': document.getElementById('minutes'),
+                'summary': document.getElementById('summary'),
+                'outline': document.getElementById('outline')
+            };
+
+            function loadSettings() {
+                const settings = JSON.parse(localStorage.getItem('transcriberSettings') || '{}');
+                elements['FW-apiKey'].value = settings['FW-apiKey'] || '';
+                elements['FW-model'].value = settings['FW-model'] || 'whisper-v3-turbo';
+                elements['FW-apiUrl'].value = settings['FW-apiUrl'] || 'https://audio-turbo.us-virginia-1.direct.fireworks.ai/v1';
+                elements['Opn-apiKey'].value = settings['Opn-apiKey'] || '';
+                elements['Opn-model'].value = settings['Opn-model'] || 'google/gemini-2.5-flash';
+                elements['Opn-apiUrl'].value = settings['Opn-apiUrl'] || 'https://openrouter.ai/api/v1';
+                elements['language'].value = settings['language'] || 'auto';
+                elements['diarize'].checked = settings['diarize'] || false;
+                elements['proofread'].value = settings['proofread'] || "Proofread and correct this text. Fix grammar, punctuation, and spelling. Keep the meaning the same. Make it clear, concise, and coherent.";
+                elements['minutes'].value = settings['minutes'] || "Convert the transcript into meeting minutes. Structure the minutes with a clear agenda, discussion points, decisions, and action items. Use bullet points.";
+                elements['summary'].value = settings['summary'] || "Summarize the transcript. Capture the main points, key arguments, and conclusions. Keep it brief and to the point.";
+                elements['outline'].value = settings['outline'] || "Create a structured outline from the transcript. Break down the content into sections, subsections, and bullet points. Include headings and subheadings.";
+            }
+
+            function saveSettings() {
+                const settings = {
+                    'FW-apiKey': elements['FW-apiKey'].value,
+                    'FW-model': elements['FW-model'].value,
+                    'FW-apiUrl': elements['FW-apiUrl'].value,
+                    'Opn-apiKey': elements['Opn-apiKey'].value,
+                    'Opn-model': elements['Opn-model'].value,
+                    'Opn-apiUrl': elements['Opn-apiUrl'].value,
+                    'language': elements['language'].value,
+                    'diarize': elements['diarize'].checked,
+                    'proofread': elements['proofread'].value,
+                    'minutes': elements['minutes'].value,
+                    'summary': elements['summary'].value,
+                    'outline': elements['outline'].value
+                };
+                localStorage.setItem('transcriberSettings', JSON.stringify(settings));
+                showStatus(elements.settingsStatus, 'Settings saved successfully!', 'success');
+            }
+
+            function showStatus(element, message, type) {
+                element.textContent = message;
+                element.className = `status ${type}`;
+                setTimeout(() => {
+                    element.textContent = '';
+                    element.className = 'status';
+                }, 5000);
+            }
+
+            function setupEventListeners() {
+                elements.saveSettings.addEventListener('click', saveSettings);
+                document.querySelectorAll('.toggle-password').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const input = btn.previousElementSibling;
+                        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                        input.setAttribute('type', type);
+                        btn.textContent = type === 'password' ? '👁️' : '🙈';
+                    });
+                });
+            }
+
+            // Export settings to JSON file
+            function exportSettings() {
+                const settings = JSON.parse(localStorage.getItem('transcriberSettings') || '{}');
+                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(settings, null, 2));
+                const downloadAnchor = document.createElement('a');
+                downloadAnchor.setAttribute("href", dataStr);
+                downloadAnchor.setAttribute("download", "transcriber-settings.json");
+                document.body.appendChild(downloadAnchor);
+                downloadAnchor.click();
+                downloadAnchor.remove();
+                showStatus(elements.settingsStatus, 'Settings exported successfully!', 'success');
+            }
+
+            // Import settings from JSON file
+            function importSettings() {
+                document.getElementById('importFile').click();
+            }
+
+            // Handle imported file
+            function handleFileImport(event) {
+                const file = event.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        const settings = JSON.parse(e.target.result);
+                        localStorage.setItem('transcriberSettings', JSON.stringify(settings));
+                        loadSettings();
+                        showStatus(elements.settingsStatus, 'Settings imported successfully!', 'success');
+                    } catch (error) {
+                        showStatus(elements.settingsStatus, 'Error: Invalid settings file', 'error');
+                    }
+                };
+                reader.readAsText(file);
+                event.target.value = ''; // Reset input
+            }
+
+            function setupEventListeners() {
+                elements.saveSettings.addEventListener('click', saveSettings);
+                document.getElementById('exportSettings').addEventListener('click', exportSettings);
+                document.getElementById('importSettings').addEventListener('click', importSettings);
+                document.getElementById('importFile').addEventListener('change', handleFileImport);
+                document.querySelectorAll('.toggle-password').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const input = btn.previousElementSibling;
+                        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
+                        input.setAttribute('type', type);
+                        btn.textContent = type === 'password' ? '👁️' : '🙈';
+                    });
+                });
+            }
+
+            loadSettings();
+            setupEventListeners();
+        });
+    </script>
+</body>
+</html>

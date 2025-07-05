@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Audio Transcription & AI Processor</title>
+    <meta name="theme-color" content="#2563eb">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <header>
+        <h1>Audio Transcription & AI Processor</h1>
+        <nav>
+            <a href="settings.html">Settings</a>
+            <a href="about.html">About</a>
+        </nav>
+    </header>
+    
+    <div class="container">
+        
+        
+        <!-- Transcription Panel -->
+        <div class="panel">
+            <h2 class="panel-title">🎤 Audio Transcription</h2>
+            <div class="form-group">
+                <label>Upload Audio/Video File</label>
+                <div class="file-upload-wrapper">
+                    <label for="audioFile" class="file-upload-label">📁 Choose File</label>
+                    <input type="file" id="audioFile" class="hidden-file-input" accept="audio/*, .mp3, .m4a, .wav, video/mp4">
+                    <span id="fileName" class="file-name-display">No file chosen</span>
+                </div>
+            </div>
+            <div class="form-group">
+                <label for="language">Language</label>
+                <select id="language">
+                    <option value="auto">Auto Detect</option>
+                    <option value="en">English</option>
+                    <option value="zh">Chinese</option>
+                    <option value="id">Indonesian</option>
+                    <option value="ms">Malay</option>
+                    <option value="th">Thai</option>
+                    <option value="vi">Vietnamese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="yue">Cantonese</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                </select>
+            </div>
+            <div class="checkbox-wrapper">
+                <input type="checkbox" id="diarize">
+                <label for="diarize">Speakers Diarization (Check! If this is a meeting recording)</label>
+            </div>
+            <button id="transcribeBtn" disabled>Transcribe Audio</button>
+            <div id="transcribeStatus" class="status"></div>
+            <div class="form-group">
+                <label for="transcription">Transcription</label>
+                <!-- <textarea id="transcription" placeholder="Transcription will appear here..." readonly></textarea> -->
+                 <textarea id="transcription" placeholder="Transcription will appear here..."></textarea>
+            </div>
+            <button id="copyTranscription" class="btn-secondary">📋 Copy Transcription</button>
+        </div>
+        
+        <!-- Processing Panel -->
+        <div class="panel stacked-panel">
+            <h2 class="panel-title">✨ Text Processing</h2>
+            <div class="btn-group">
+                <button id="proofreadBtn" disabled>Proofread</button>
+                <button id="minutesBtn" disabled>Meeting Minutes</button>
+                <button id="summaryBtn" disabled>Summary</button>
+                <button id="outlineBtn" disabled>Outline</button>
+            </div>
+            <div id="processStatus" class="status"></div>
+            <div class="form-group">
+                <label for="processedText">Processed Result</label>
+                <div id="processedTextViewer" class="markdown-viewer"></div>
+                <textarea id="processedText" class="hidden" readonly></textarea>
+            </div>
+            <button id="copyProcessed" class="btn-secondary" disabled>📋 Copy Result</button>
+        </div>
+    </div>
+    
+    <footer>
+        <p>Audio Transcription & AI Processor PWA | All processing happens securely via OpenAI API</p>
+    </footer>
+
+    <script>
+        console.log('DEBUG: Script started loading');
+        document.addEventListener('DOMContentLoaded', () => {
+            console.log('DEBUG: DOM Content Loaded');
+            
+            // DOM Elements
+            const elements = {
+                'audioFile': document.getElementById('audioFile'),
+                'language': document.getElementById('language'),
+                'diarize': document.getElementById('diarize'),
+                'transcribeBtn': document.getElementById('transcribeBtn'),
+                'transcribeStatus': document.getElementById('transcribeStatus'),
+                'transcription': document.getElementById('transcription'),
+                'copyTranscription': document.getElementById('copyTranscription'),
+                'proofreadBtn': document.getElementById('proofreadBtn'),
+                'minutesBtn': document.getElementById('minutesBtn'),
+                'summaryBtn': document.getElementById('summaryBtn'),
+                'outlineBtn': document.getElementById('outlineBtn'),
+                'processStatus': document.getElementById('processStatus'),
+                'processedText': document.getElementById('processedText'),
+                'copyProcessed': document.getElementById('copyProcessed'),
+                'processedTextViewer': document.getElementById('processedTextViewer')
+            };
+
+            // Load settings from localStorage
+            function loadSettings() {
+                const settings = JSON.parse(localStorage.getItem('transcriberSettings') || '{}');
+                elements['language'].value = settings['language'] || 'auto';
+                elements['diarize'].checked = settings['diarize'] || false;
+            }
+
+            // Update button states based on conditions
+            function updateButtonStates() {
+                const hasAudio = elements.audioFile.files.length > 0;
+                const hasTranscription = elements.transcription.value.trim().length > 0;
+                const settings = JSON.parse(localStorage.getItem('transcriberSettings') || '{}');
+                
+                const hasFwApiKey = settings && settings['FW-apiKey'];
+                const hasOpnApiKey = settings && settings['Opn-apiKey'];
+                elements.transcribeBtn.disabled = !(hasFwApiKey && hasAudio);
+                elements.proofreadBtn.disabled = !(hasOpnApiKey && hasTranscription);
+                elements.minutesBtn.disabled = !(hasOpnApiKey && hasTranscription);
+                elements.summaryBtn.disabled = !(hasOpnApiKey && hasTranscription);
+                elements.outlineBtn.disabled = !(hasOpnApiKey && hasTranscription);
+                elements.copyProcessed.disabled = elements.processedText.value.trim().length === 0;
+            }
+
+            // Show status message
+            function showStatus(element, message, type) {
+                element.textContent = message;
+                element.className = `status ${type}`;
+                setTimeout(() => {
+                    element.textContent = '';
+                    element.className = 'status';
+                }, 5000);
+            }
+
+            // Copy text to clipboard utility function
+            function copyToClipboard(text) {
+                navigator.clipboard.writeText(text)
+                    .then(() => alert('Text copied to clipboard!'))
+                    .catch(err => console.error('Copy failed:', err));
+            }
+
+            // Transcribe audio using Whisper API
+            async function transcribeAudio(file) {
+                showStatus(elements.transcribeStatus, 'Transcribing audio...', 'processing');
+                
+                const settings = JSON.parse(localStorage.getItem('transcriberSettings') || '{}');
+                
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('model', settings['FW-model']);
+                if (elements.language.value !== 'auto') {
+                    formData.append('language', elements.language.value);
+                }
+                if (elements.diarize.checked) {
+                    formData.append('diarize', 'true');
+                    formData.append('response_format', 'verbose_json');
+                    formData.append('timestamp_granularities[]', 'word,segment');
+                }
+                
+                try {
+                    const response = await fetch(settings['FW-apiUrl'] + "/audio/transcriptions", {
+                        method: 'POST',
+                        headers: {
+                            'Authorization': `Bearer ${settings['FW-apiKey']}`
+                        },
+                        body: formData
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    if (elements.diarize.checked) {
+                        elements.transcription.value = formatDiarizedText(result.segments);
+                    } else {
+                        elements.transcription.value = result.text;
+                    }
+                    showStatus(elements.transcribeStatus, 'Transcription completed!', 'success');
+                    updateButtonStates();
+                } catch (error) {
+                    showStatus(elements.transcribeStatus, `Error: ${error.message}`, 'error');
+                    throw error;
+                }
+            }
+
+            // Format diarized text with speaker labels
+            function formatDiarizedText(segments) {
+                if (!segments || segments.length === 0) return '';
+
+                let formattedText = '';
+                let currentSpeaker = null;
+                let currentText = '';
+
+                segments.forEach(segment => {
+                    const speaker = segment.speaker_id || 'Unknown';
+                    if (speaker !== currentSpeaker) {
+                        if (currentSpeaker) {
+                            formattedText += `\n\n${currentSpeaker}: ${currentText.trim()}`;
+                        }
+                        currentSpeaker = speaker;
+                        currentText = '';
+                    }
+                    currentText += `${segment.text} `;
+                });
+
+                if (currentSpeaker) {
+                    formattedText += `\n\n${currentSpeaker}: ${currentText.trim()}`;
+                }
+
+                return formattedText.trim();
+            }
+            
+            // Convert Markdown to HTML
+            function markdownToHtml(markdown) {
+                if (!markdown) {
+                    return '<div class="placeholder">Processed text will appear here...</div>';
+                }
+                
+                let html = markdown;
+                
+                // Headers
+                html = html.replace(/^# (.*$)/gim, '<h1>$1</h1>');
+                html = html.replace(/^## (.*$)/gim, '<h2>$1</h2>');
+                html = html.replace(/^### (.*$)/gim, '<h3>$1</h3>');
+                html = html.replace(/^#### (.*$)/gim, '<h4>$1</h4>');
+                html = html.replace(/^##### (.*$)/gim, '<h5>$1</h5>');
+                html = html.replace(/^###### (.*$)/gim, '<h6>$1</h6>');
+                
+                // Bold and italic
+                html = html.replace(/\*\*(.*?)\*\*/gim, '<strong>$1</strong>');
+                html = html.replace(/\*(.*?)\*/gim, '<em>$1</em>');
+                
+                // Lists
+                let lines = html.split('\n');
+                let inList = false;
+                let inOrderedList = false;
+                let output = [];
+                
+                for (let i = 0; i < lines.length; i++) {
+                    let line = lines[i];
+                    
+                    // Unordered list item
+                    if (/^\s*[-*]\s+(.*)$/.test(line)) {
+                        if (!inList) {
+                            output.push('<ul>');
+                            inList = true;
+                        }
+                        output.push('<li>' + line.replace(/^\s*[-*]\s+(.*)$/, '$1') + '</li>');
+                    }
+                    // Ordered list item
+                    else if (/^\s*\d+\.\s+(.*)$/.test(line)) {
+                        if (!inOrderedList) {
+                            output.push('<ol>');
+                            inOrderedList = true;
+                        }
+                        output.push('<li>' + line.replace(/^\s*\d+\.\s+(.*)$/, '$1') + '</li>');
+                    }
+                    // Non-list line
+                    else {
+                        if (inList) {
+                            output.push('</ul>');
+                            inList = false;
+                        }
+                        if (inOrderedList) {
+                            output.push('</ol>');
+                            inOrderedList = false;
+                        }
+                        output.push(line);
+                    }
+                }
+                
+                // Close any remaining lists
+                if (inList) {
+                    output.push('</ul>');
+                }
+                if (inOrderedList) {
+                    output.push('</ol>');
+                }
+                
+                html = output.join('\n');
+                return html;
+            }
+
+            // Process text with GPT
+            async function processText(action) {
+                showStatus(elements.processStatus, 'Processing text...', 'processing');
+                
+                const settings = JSON.parse(localStorage.getItem('transcriberSettings') || '{}');
+                
+                const text = elements.transcription.value;
+                // Define default prompts as fallback
+                const defaultPrompts = {
+                    proofread: "Proofread and correct this text. Fix grammar, punctuation, and spelling. Keep the meaning the same. Make it clear, concise, and coherent.",
+                    minutes: "Convert the transcript into meeting minutes. Structure the minutes with a clear agenda, discussion points, decisions, and action items. Use bullet points.",
+                    summary: "Summarize the transcript. Capture the main points, key arguments, and conclusions. Keep it brief and to the point.",
+                    outline: "Create a structured outline from the transcript. Break down the content into sections, subsections, and bullet points. Include headings and subheadings."
+                };
+                
+                // Use saved prompts from settings or fallback to defaults
+                const promptText = settings[action] || defaultPrompts[action];
+                
+                try {
+                    const response = await fetch(settings['Opn-apiUrl'] + "/chat/completions", {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Authorization': `Bearer ${settings['Opn-apiKey']}`
+                        },
+                        body: JSON.stringify({
+                            model: settings['Opn-model'],
+                            messages: [
+                                { role: "system", content: promptText },
+                                { role: "user", content: text }
+                            ],
+                            temperature: 0.2
+                        })
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error(`API Error: ${response.status} ${response.statusText}`);
+                    }
+                    
+                    const result = await response.json();
+                    const processedText = result.choices[0].message.content;
+                    elements.processedText.value = processedText;
+                    elements.processedTextViewer.innerHTML = markdownToHtml(processedText);
+                    showStatus(elements.processStatus, `Text ${action} completed!`, 'success');
+                    updateButtonStates();
+                } catch (error) {
+                    showStatus(elements.processStatus, `Error: ${error.message}`, 'error');
+                    throw error;
+                }
+            }
+
+            // Extract plaintext from Markdown HTML elements
+            function extractMarkdownText(html) {
+                if (!html) return '';
+
+                // Convert Markdown to valid HTML (for proper element parsing)
+                const markdownHtml = markdownToHtml(html);
+                const container = document.createElement('div');
+                container.innerHTML = markdownHtml;
+                
+                const textElements = container.querySelectorAll('p, h1, h2, h3, h4, h5, h6, pre, code, li, ul, ol');
+                let plainText = '';
+                textElements.forEach(element => {
+                    plainText += element.textContent.trim() + '\n';
+
+                    // Preserve line breaks for certain elements
+                    if (['LI', 'H1', 'H2', 'H3', 'H4', 'H5', 'H6', 'P'].includes(element.tagName)) {
+                        plainText += '\n';
+                    }
+                });
+
+                // Final cleanup: remove excess line breaks
+                return plainText.replace(/(\r?\n){2,}/g, '\n').trim();
+            }
+
+            // Dedicated handler for Markdown-formatted rich text conversion
+            function copyRichTextToClipboard(markdownContent) {
+                // Convert markdown to HTML
+                const htmlContent = markdownToHtml(markdownContent);
+                const plainTextFallback = extractMarkdownText(markdownContent);
+                
+                // Try modern clipboard API first
+                if (navigator.clipboard && navigator.clipboard.write) {
+                    const clipboardItem = new ClipboardItem({
+                        'text/html': new Blob([htmlContent], { type: 'text/html' }),
+                        'text/plain': new Blob([plainTextFallback], { type: 'text/plain' })
+                    });
+                    
+                    navigator.clipboard.write([clipboardItem])
+                        .then(() => alert('Rich text copied! You can paste it into Word or other word processors.'))
+                        .catch(err => {
+                            console.error('Modern clipboard API failed:', err);
+                            fallbackCopyRichText(htmlContent, plainTextFallback);
+                        });
+                } else {
+                    // Fallback for older browsers
+                    fallbackCopyRichText(htmlContent, plainTextFallback);
+                }
+            }
+            
+            // Fallback method for copying rich text
+            function fallbackCopyRichText(htmlContent, plainTextFallback) {
+                const tempDiv = document.createElement('div');
+                tempDiv.innerHTML = htmlContent;
+                tempDiv.style.position = 'absolute';
+                tempDiv.style.left = '-9999px';
+                document.body.appendChild(tempDiv);
+                
+                const selection = window.getSelection();
+                const range = document.createRange();
+                range.selectNodeContents(tempDiv);
+                selection.removeAllRanges();
+                selection.addRange(range);
+                
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        alert('Rich text copied! You can paste it into Word or other word processors.');
+                    } else {
+                        throw new Error('execCommand failed');
+                    }
+                } catch (err) {
+                    console.error('Fallback copy failed:', err);
+                    // Final fallback to plain text
+                    navigator.clipboard.writeText(plainTextFallback)
+                        .then(() => alert('Copied as plain text (rich text copying not supported on this browser).'))
+                        .catch(e => console.error('All copy methods failed:', e));
+                } finally {
+                    document.body.removeChild(tempDiv);
+                    selection.removeAllRanges();
+                }
+            }
+
+            // Setup Event Listeners
+            function setupEventListeners() {
+                // File input handler
+                elements.audioFile.addEventListener('change', (event) => {
+                    if (event.target.files.length > 0) {
+                        document.getElementById('fileName').textContent = event.target.files[0].name;
+                    } else {
+                        document.getElementById('fileName').textContent = 'No file chosen';
+                    }
+                    updateButtonStates();
+                });
+
+                // Transcription input handler
+                elements.transcription.addEventListener('input', updateButtonStates);
+
+                // Transcribe button handler
+                elements.transcribeBtn.addEventListener('click', async () => {
+                    if (elements.audioFile.files.length > 0) {
+                        await transcribeAudio(elements.audioFile.files[0]);
+                    }
+                });
+
+                // Copy transcription button handler
+                elements.copyTranscription.addEventListener('click', () => {
+                    copyToClipboard(elements.transcription.value);
+                });
+
+                // Copy processed text button handler
+                elements.copyProcessed.addEventListener('click', () => {
+                    copyRichTextToClipboard(elements.processedText.value);
+                });
+
+                // Process action buttons
+                const processActions = {
+                    proofreadBtn: 'proofread',
+                    minutesBtn: 'minutes',
+                    summaryBtn: 'summary',
+                    outlineBtn: 'outline'
+                };
+                
+                for (const [btnId, action] of Object.entries(processActions)) {
+                    elements[btnId].addEventListener('click', () => processText(action));
+                }
+            }
+
+            // Initialize the application
+            loadSettings();
+            updateButtonStates();
+            setupEventListeners();
+            
+            console.log('DEBUG: Script initialization completed');
+        });
+    </script>
+</body>
+</html>
