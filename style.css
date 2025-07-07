@@ -197,6 +197,10 @@
             margin: 15px 0;
         }
         
+        .btn-group.right-aligned {
+            justify-content: flex-end;
+        }
+        
         .btn-secondary {
             background: #64748b;
         }

@@ -17,6 +17,12 @@
     </header>
     
     <div class="container">
+  <div class="btn-group right-aligned">
+   <button id="importSettings">Import Settings</button>
+   <button id="exportSettings">Export Settings</button>
+   <input type="file" id="importFile" accept=".json" style="display: none">
+  </div>
+
         <!-- Settings Panel -->
         <div class="panel">
             <h2 class="panel-title">⚙️ Settings</h2>
@@ -89,17 +95,12 @@
                 <textarea id="outline" rows="3" placeholder="Enter outline prompt">Create a structured outline from the transcript. Break down the content into sections, subsections, and bullet points. Include headings and subheadings.</textarea>
             </div>
             <button id="saveSettings">Save Settings</button>
-            <div class="btn-group">
-                <button id="exportSettings">Export Settings</button>
-                <button id="importSettings">Import Settings</button>
-                <input type="file" id="importFile" accept=".json" style="display: none">
-            </div>
             <div id="settingsStatus" class="status"></div>
         </div>
     </div>
     
     <footer>
-        <p>Audio Transcription & AI Processor PWA | All processing happens securely via OpenAI API</p>
+        <p>Audio Transcription & AI Processor PWA | All processing happens securely</p>
     </footer>
 
     <script>

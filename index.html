@@ -16,9 +16,7 @@
         </nav>
     </header>
     
-    <div class="container">
-        
-        
+    <div class="container">       
         <!-- Transcription Panel -->
         <div class="panel">
             <h2 class="panel-title">🎤 Audio Transcription</h2>
@@ -81,7 +79,7 @@
     </div>
     
     <footer>
-        <p>Audio Transcription & AI Processor PWA | All processing happens securely via OpenAI API</p>
+        <p>Audio Transcription & AI Processor PWA | All processing happens securely</p>
     </footer>
 
     <script>
@@ -511,6 +509,15 @@
 
             // Initialize the application
             loadSettings();
+
+            // Check if API keys are set; if not, redirect to settings page
+            const settings = JSON.parse(localStorage.getItem('transcriberSettings') || '{}');
+            if (!settings['FW-apiKey'] || !settings['Opn-apiKey']) {
+                alert('API keys are not set. You will be redirected to the settings page.');
+                window.location.href = 'settings.html';
+                return; // Stop further execution
+            }
+
             updateButtonStates();
             setupEventListeners();
             

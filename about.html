@@ -3,113 +3,442 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - Audio Transcription & AI Processor</title>
-    <link rel="stylesheet" href="style.css">
+    <title>About - Audio Transcription & AI Text Processing</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 60px 30px 40px; /* Increased top padding for nav */
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .header-nav {
+            position: absolute;
+            top: 15px;
+            right: 20px;
+            display: flex;
+            gap: 15px;
+        }
+        
+        .header-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 500;
+            padding: 6px 12px;
+            border-radius: 4px;
+            background: #1e40af; /* Dark blue base color */
+            transition: background 0.2s;
+        }
+        
+        .header-nav a:hover {
+            background: #2563eb; /* Medium blue hover */
+        }
+        
+        .header-nav a.active {
+            background: #3b82f6; /* Lighter blue active state */
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: pulse 4s ease-in-out infinite;
+        }
+		nav {
+			display: flex;
+			gap: 20px;
+		}
+
+		nav a {
+            text-decoration: none;
+            color: var(--dark);
+            font-weight: 500;
+            padding: 8px 12px;
+            border-radius: 6px;
+            transition: background 0.2s;
+        }
+        
+        nav a:hover {
+            background: var(--secondary);
+        }
+        
+        nav a.active {
+            background: var(--primary);
+            color: white;
+        }
+
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); opacity: 0.3; }
+            50% { transform: scale(1.1); opacity: 0.6; }
+        }
+
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header .subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .content {
+            padding: 40px 30px;
+        }
+
+        .section {
+            margin-bottom: 40px;
+            padding: 30px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+            border: 1px solid rgba(102, 126, 234, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .section:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+        }
+
+        .section h2 {
+            font-size: 1.8em;
+            margin-bottom: 20px;
+            color: #4facfe;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section h3 {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            color: #667eea;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .feature-card {
+            background: linear-gradient(135deg, #f8f9ff 0%, #e8f2ff 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid rgba(79, 172, 254, 0.2);
+            transition: all 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(79, 172, 254, 0.2);
+        }
+
+        .feature-icon {
+            font-size: 2em;
+            margin-bottom: 10px;
+            display: block;
+        }
+
+        .feature-title {
+            font-weight: 600;
+            color: #4facfe;
+            margin-bottom: 8px;
+        }
+
+        .feature-description {
+            color: #666;
+            font-size: 0.9em;
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .tech-badge {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-size: 0.9em;
+            font-weight: 500;
+        }
+
+        .recommendation {
+            background: linear-gradient(135deg, #a8e6cf 0%, #dcedc8 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border-left: 4px solid #4caf50;
+        }
+
+        .warning {
+            background: linear-gradient(135deg, #ffecb3 0%, #fff3c4 100%);
+            padding: 20px;
+            border-radius: 12px;
+            margin: 15px 0;
+            border-left: 4px solid #ff9800;
+        }
+
+        .privacy-item {
+            background: #f8f9ff;
+            padding: 15px;
+            border-radius: 8px;
+            margin: 10px 0;
+            border-left: 3px solid #4facfe;
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 25px;
+            border-radius: 12px;
+            text-align: center;
+        }
+
+        .contact-info a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 25px;
+            display: inline-block;
+            margin-top: 10px;
+            transition: background 0.3s ease;
+        }
+
+        .contact-info a:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .version-badge {
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+            padding: 5px 12px;
+            border-radius: 15px;
+            font-size: 0.8em;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                margin: 10px;
+                border-radius: 15px;
+            }
+            
+            .header {
+                padding: 30px 20px;
+            }
+            
+            .header h1 {
+                font-size: 2em;
+            }
+            
+            .content {
+                padding: 20px;
+            }
+            
+            .section {
+                padding: 20px;
+            }
+            
+            .feature-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-    <header>
-        <h1>Audio Transcription & AI Processor</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="about.html" class="active">About</a>
-        </nav>
-    </header>
-    
-    <div class="about-container">
-        <div class="about-section">
-            <h2 class="about-title">📝 About This Application</h2>
-            <p>This Progressive Web App (PWA) provides powerful audio transcription and AI-powered text processing capabilities right in your browser. Convert speech to text, then enhance the results with AI-powered proofreading, summarization, and more.</p>
-            
-            <p>Designed for professionals, students, journalists, and anyone who needs to convert spoken content into polished written documents efficiently.</p>
-            
-            <p class="version">Version 1.0.0</p>
-        </div>
-        
-        <div class="about-section">
-            <h2 class="about-title">✨ Key Features</h2>
-            <ul class="feature-list">
-                <li>
-                    <span class="icon">🎤</span>
-                    <div>
-                        <strong>Audio Transcription</strong> - Convert speech to text using OpenAI's Whisper technology
-                    </div>
-                </li>
-                <li>
-                    <span class="icon">🔍</span>
-                    <div>
-                        <strong>Proofreading</strong> - Fix grammar, spelling, and punctuation errors automatically
-                    </div>
-                </li>
-                <li>
-                    <span class="icon">📋</span>
-                    <div>
-                        <strong>Meeting Minutes</strong> - Transform raw transcripts into professional meeting minutes
-                    </div>
-                </li>
-                <li>
-                    <span class="icon">📝</span>
-                    <div>
-                        <strong>Summarization</strong> - Extract key points from long transcripts
-                    </div>
-                </li>
-                <li>
-                    <span class="icon">📑</span>
-                    <div>
-                        <strong>Outline Generation</strong> - Create structured outlines from unstructured content
-                    </div>
-                </li>
-                <li>
-                    <span class="icon">📱</span>
-                    <div>
-                        <strong>PWA Support</strong> - Installable on your device for offline use
-                    </div>
-                </li>
-            </ul>
-        </div>
-        
-        <div class="about-section">
-            <h2 class="about-title">🛠️ Technical Details</h2>
-            <p>This application leverages cutting-edge AI technologies to deliver accurate results:</p>
-            
-            <div class="tech-stack">
-                <div class="tech-item">OpenAI Whisper</div>
-                <div class="tech-item">GPT-3.5/4</div>
-                <div class="tech-item">Progressive Web App</div>
-                <div class="tech-item">Web Audio API</div>
-                <div class="tech-item">Service Workers</div>
-                <div class="tech-item">LocalStorage</div>
+    <div class="container">
+        <div class="header">
+                <nav class="header-nav">
+                    <a href="index.html">Home</a>
+                    <a href="settings.html">Settings</a>
+                </nav>
+                <h1>🎙️ Audio Transcription & AI Text Processing</h1>
+                <p class="subtitle">Transform speech into polished documents with cutting-edge AI technology</p>
+                <span class="version-badge">Version 1.0.0</span>
             </div>
-            
-            <p>All processing happens securely via OpenAI's API. Your data is never stored on our servers.</p>
-        </div>
-        
-        <div class="about-section">
-            <h2 class="about-title">🔒 Privacy Policy</h2>
-            <div class="privacy-policy">
-                <h3>Data Handling</h3>
-                <p>Your audio files and transcripts are processed directly in your browser or sent to OpenAI's API for processing. No data is stored on any intermediary servers.</p>
+
+        <div class="content">
+            <div class="section">
+                <h2>📝 About This Application</h2>
+                <p>This powerful web application combines advanced audio transcription with intelligent AI-powered text processing, all running seamlessly in your browser. Convert spoken content into written text with remarkable accuracy, then enhance your results through automated proofreading, summarization, and professional formatting.</p>
                 
-                <h3>API Keys</h3>
-                <p>Your OpenAI API key is stored locally in your browser's storage and is only used to make direct requests to OpenAI's API. We never see or store your API key.</p>
-                
-                <h3>Cookies</h3>
-                <p>This application uses localStorage to remember your settings but does not use tracking cookies.</p>
-                
-                <h3>Offline Use</h3>
-                <p>When installed as a PWA, the application can work offline for previously accessed content, but transcription and AI features require an internet connection.</p>
+                <p>Whether you're a journalist transcribing interviews, a student processing lecture recordings, or a business professional creating meeting minutes, this tool streamlines your workflow and delivers professional-quality results efficiently.</p>
             </div>
-        </div>
-        
-        <div class="about-section">
-            <h2 class="about-title">📧 Contact & Support</h2>
-            <p>For feature requests, bug reports, or questions:</p>
-            <p>Email: <a href="mailto:support@audiotranscriber.app">support@audiotranscriber.app</a></p>
-            <p>GitHub: <a href="https://github.com/yourusername/audio-transcriber" target="_blank">github.com/yourusername/audio-transcriber</a></p>
+
+            <div class="section">
+                <h2>✨ Key Features</h2>
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <span class="feature-icon">🎤</span>
+                        <div class="feature-title">Audio Transcription</div>
+                        <div class="feature-description">Convert speech to text using OpenAI's advanced Whisper technology with exceptional accuracy and language support.</div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🔍</span>
+                        <div class="feature-title">AI Proofreading</div>
+                        <div class="feature-description">Automatically correct grammar, spelling, and punctuation errors while preserving your original meaning and tone.</div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📋</span>
+                        <div class="feature-title">Meeting Minutes</div>
+                        <div class="feature-description">Transform raw conversation transcripts into professional, structured meeting minutes with action items and key decisions.</div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📝</span>
+                        <div class="feature-title">Smart Summarization</div>
+                        <div class="feature-description">Extract essential points and create concise summaries from lengthy transcripts and documents.</div>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📑</span>
+                        <div class="feature-title">Outline Generation</div>
+                        <div class="feature-description">Create well-structured outlines and organize unstructured content into logical, hierarchical formats.</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🛠️ Technical Architecture</h2>
+                <p>This application leverages state-of-the-art AI technologies to deliver accurate, reliable results:</p>
+                
+                <div class="tech-stack">
+                    <span class="tech-badge">OpenAI Whisper</span>
+                    <span class="tech-badge">OpenAI Compatible Models</span>
+                    <span class="tech-badge">Service Workers</span>
+                    <span class="tech-badge">LocalStorage</span>
+                    <span class="tech-badge">Browser APIs</span>
+                </div>
+                
+                <p style="margin-top: 20px;">All processing occurs securely through trusted AI APIs. Your sensitive data is never stored on our servers, ensuring complete privacy and security.</p>
+            </div>
+
+            <div class="section">
+                <h2>🔑 API Setup & Configuration</h2>
+                <h3>Required Services</h3>
+                <p>To use this application, you'll need to create accounts and obtain API keys from the following services:</p>
+                
+                <div class="recommendation">
+                    <strong>📋 Setup Instructions:</strong>
+                    <ol style="margin-top: 10px; padding-left: 20px;">
+                        <li>Create accounts with <strong><a href="https://app.fireworks.ai/login">Firework</a></strong> and <strong><a href="https://openrouter.ai/">OpenRouter</a></strong></li>
+                        <li>Purchase a minimum credit (approximately US$5.00 each)</li>
+                        <li>Generate your API keys from each service</li>
+                        <li>Configure the keys in the application settings</li>
+                    </ol>
+                </div>
+                
+                <div class="warning">
+                    <strong>⚠️ Security Notice:</strong> Never share your API keys with others. Keep them secure and treat them like passwords. Your keys are stored locally in your browser and never transmitted to our servers.
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>🎯 Recommended Models</h2>
+                
+                <h3>🎙️ Transcription Model</h3>
+                <div class="recommendation">
+                    <strong><a href="https://fireworks.ai/models/fireworks/whisper-v3-turbo">Firework Whisper V3 Turbo model</a></strong>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li><strong>Cost Effective:</strong> US$0.0009 per minute (standard) or US$0.00126 per minute (with speaker diarization)</li>
+                        <li><strong>Privacy First:</strong> <a href="https://docs.fireworks.ai/guides/security_compliance/data_handling">Fireworks has Zero Data Retention by default.</a></li>
+                        <li><strong>High Accuracy:</strong> State-of-the-art speech recognition technology</li>
+                        <li><strong>Language Support:</strong> Multiple languages and dialects</li>
+                    </ul>
+                </div>
+                
+                <h3>📝 Text Processing Model</h3>
+                <div class="recommendation">
+                    <strong>OpenRouter Models</strong>
+                    <ul style="margin-top: 10px; padding-left: 20px;">
+                        <li><strong>Privacy Protected:</strong> <a href="https://openrouter.ai/docs/features/privacy-and-logging">OpenRouter does not store your prompts or responses</a></li>
+                        <li><strong>Model Variety:</strong> Access to multiple AI models</li>
+                        <li><strong>Competitive Pricing:</strong> Transparent, usage-based pricing</li>
+                    </ul>
+                </div>
+                
+                <p><em>Note: While any OpenAI-compatible model can be used, be aware that many free AI services use your data for model training. The recommended services prioritize data privacy.</em></p>
+            </div>
+
+            <div class="section">
+                <h2>🔒 Privacy & Security</h2>
+                
+                <div class="privacy-item">
+                    <h3>🗂️ Data Handling</h3>
+                    <p>Your audio files and transcripts are processed directly in your browser or sent securely to AI APIs. No data passes through or is stored on our servers.</p>
+                </div>
+                
+                <div class="privacy-item">
+                    <h3>🔐 API Key Security</h3>
+                    <p>Your API keys are stored locally in your browser's secure storage and are only used for direct API requests. We never have access to your keys.</p>
+                </div>
+                
+                <div class="privacy-item">
+                    <h3>🍪 Storage & Cookies</h3>
+                    <p>This application uses localStorage to remember your preferences and settings. No tracking cookies or analytics are used.</p>
+                </div>
+                
+                <div class="privacy-item">
+                    <h3>🔍 Transparency</h3>
+                    <p>The complete source code is available for review at <a href="https://github.com/jarchitect1/simple_transcriber" target="_blank" rel="noopener noreferrer" style="color: #4facfe; text-decoration: none; font-weight: 600;">GitHub</a>. This ensures full transparency about how your data is handled and processed.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="contact-info">
+                    <h2>📧 Contact & Support</h2>
+                    <p>Need help, have suggestions, or found a bug? We'd love to hear from you!</p>
+                    <a href="mailto:smartygab24@gmail.com">📮 smartygab24@gmail.com</a>
+                    <p style="margin-top: 15px; font-size: 0.9em; opacity: 0.8;">
+                        We typically respond within 24 hours and welcome feature requests, bug reports, and general questions.
+                    </p>
+                </div>
+            </div>
         </div>
     </div>
-    
-    <footer>
-        <p>Audio Transcription & AI Processor © 2023 | All rights reserved</p>
-    </footer>
 </body>
 </html>
