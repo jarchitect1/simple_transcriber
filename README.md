@@ -2,6 +2,12 @@
 
 A powerful web application that combines advanced audio transcription with intelligent AI-powered text processing, all running seamlessly in your browser. Transform spoken content into polished documents with cutting-edge AI technology.
 
+## 🚀 Try It Now
+🌐 Live Demo - No installation required! 
+You will need your own AI API keys.
+
+https://jarchitect.org/whisper
+
 ## ✨ Features
 
 - **🎤 Audio Transcription** - Convert speech to text using OpenAI's advanced Whisper technology with exceptional accuracy and language support
@@ -123,7 +129,7 @@ simple_transcriber/
 We welcome contributions! 
 
 ## 📋 Roadmap
-- [ ] Yet to think of any. You may email me for wishlist or fork the project.
+- [ ] Yet to think of any.
 
 ## 🐛 Bug Reports & Feature Requests
 
@@ -155,11 +161,11 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - **Contributors** who help improve this project
 
 
-## Develop Using Visual Studio Code with Kilo Code Extension
+## 🤝 Develop Using Visual Studio Code with Kilo Code Extension
 
 - Mainly with DeepSeek R1, Gemini 2.5 Pro & Claude Sonnet 4
 
-## Give Some Supports & Encouragement
+## ☕ Give Some Supports & Encouragement
 
 <a href="https://coff.ee/jarchitect" target="_blank" rel="noopener noreferrer">
   <img src="https://cdn.buymeacoffee.com/buttons/v2/default-yellow.png" alt="Buy Me A Coffee" style="height: 50px !important; width: 180px !important;">
