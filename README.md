@@ -111,8 +111,9 @@ The complete source code is available for review in this repository. This ensure
 ```
 simple_transcriber/
 ├── index.html          # Main application page
+├── settings.html       # Settings page
 ├── about.html          # About page
-└── README.md          # This file
+└── README.md           # This file
 ```
 
 ## 🌟 Use Cases
