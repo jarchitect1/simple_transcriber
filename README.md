@@ -22,7 +22,6 @@ This application leverages state-of-the-art AI technologies to deliver accurate,
 
 - **OpenAI Whisper** - Advanced speech recognition
 - **OpenAI Compatible Models** - Flexible AI text processing
-- **Service Workers** - Offline capability and performance
 - **LocalStorage** - Secure client-side data storage
 - **Browser APIs** - Native web technologies
 
@@ -148,7 +147,7 @@ Need help or have questions?
 
 - **Email**: smartygab24@gmail.com
 - **GitHub Issues**: Use the Issues tab above
-- **Response Time**: We typically respond within 24 hours
+- **Response Time**: I typically respond within 24 hours
 
 ## 📄 License
 
