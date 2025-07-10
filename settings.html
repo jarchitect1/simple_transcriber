@@ -4,236 +4,215 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Settings - Audio Transcription & AI Processor</title>
-    <meta name="theme-color" content="#2563eb">
+    <meta name="description" content="Configure API settings, language preferences, and AI processing prompts for the Audio Transcription & AI Processor">
+
+
     <link rel="stylesheet" href="style.css">
+
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
 </head>
 <body>
-    <header>
+    <header role="banner">
         <h1>Audio Transcription & AI Processor</h1>
-        <nav>
-            <a href="index.html">Home</a>
-            <a href="about.html">About</a>
+        <nav role="navigation" aria-label="Main navigation">
+            <a href="index.html" aria-label="Go to home page">Home</a>
+            <a href="about.html" aria-label="Go to about page">About</a>
         </nav>
     </header>
     
-    <div class="container">
-  <div class="btn-group right-aligned">
-   <button id="importSettings">Import Settings</button>
-   <button id="exportSettings">Export Settings</button>
-   <input type="file" id="importFile" accept=".json" style="display: none">
-  </div>
-
-        <!-- Settings Panel -->
-        <div class="panel">
-            <h2 class="panel-title">⚙️ Settings</h2>
-            <div class="form-group">
-                <label for="apiKey">Firework API Key</label>
-                <div class="password-wrapper">
-                    <input type="password" id="FW-apiKey" placeholder="Enter your Firework API key">
-                    <button type="button" class="toggle-password">👁️</button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="FW-model">Firework Model</label>
-                <input type="text" id="FW-model" placeholder="e.g., whisper-v3-turbo">
-            </div>
-            <div class="form-group">
-                <label for="FW-apiUrl">Firework API URL</label>
-                <input type="text" id="FW-apiUrl" value="https://audio-turbo.us-virginia-1.direct.fireworks.ai/v1">
-            </div>
-            <div class="form-group">
-                <label for="Opn-apiKey">OpenAI Compatible API Key</label>
-                <div class="password-wrapper">
-                    <input type="password" id="Opn-apiKey" placeholder="Enter your AI API key">
-                    <button type="button" class="toggle-password">👁️</button>
-                </div>
-            </div>
-            <div class="form-group">
-                <label for="Opn-model">OpenAI Compatible Model</label>
-                <input type="text" id="Opn-model" placeholder="e.g., google/gemini-2.5-flash">
-            </div>
-            <div class="form-group">
-                <label for="Opn-apiUrl">OpenAI Compatible API URL</label>
-                <input type="text" id="Opn-apiUrl" value="https://openrouter.ai/api/v1">
-            </div>
-            <div class="form-group">
-                <label for="language">Language</label>
-                <select id="language">
-                    <option value="auto">Auto Detect</option>
-                    <option value="en">English</option>
-                    <option value="zh">Chinese</option>
-                    <option value="id">Indonesian</option>
-                    <option value="ms">Malay</option>
-                    <option value="th">Thai</option>
-                    <option value="vi">Vietnamese</option>
-                    <option value="ja">Japanese</option>
-                    <option value="ko">Korean</option>
-                    <option value="yue">Cantonese</option>
-                    <option value="es">Spanish</option>
-                    <option value="fr">French</option>
-                </select>
-            </div>
-            <div class="checkbox-wrapper">
-                <input type="checkbox" id="diarize">
-                <label for="diarize">Speaker Diarization</label>
-            </div>
-            <!-- Prompt Settings -->
-            <div class="form-group">
-                <label for="proofread">Proofread Prompt</label>
-                <textarea id="proofread" rows="3" placeholder="Enter proofread prompt">Proofread and correct this text. Fix grammar, punctuation, and spelling. Keep the meaning the same. Make it clear, concise, and coherent.</textarea>
-            </div>
-            <div class="form-group">
-                <label for="minutes">Minutes Prompt</label>
-                <textarea id="minutes" rows="3" placeholder="Enter minutes prompt">Convert the transcript into meeting minutes. Structure the minutes with a clear agenda, discussion points, decisions, and action items. Use bullet points.</textarea>
-            </div>
-            <div class="form-group">
-                <label for="summary">Summary Prompt</label>
-                <textarea id="summary" rows="3" placeholder="Enter summary prompt">Summarize the transcript. Capture the main points, key arguments, and conclusions. Keep it brief and to the point.</textarea>
-            </div>
-            <div class="form-group">
-                <label for="outline">Outline Prompt</label>
-                <textarea id="outline" rows="3" placeholder="Enter outline prompt">Create a structured outline from the transcript. Break down the content into sections, subsections, and bullet points. Include headings and subheadings.</textarea>
-            </div>
-            <button id="saveSettings">Save Settings</button>
-            <div id="settingsStatus" class="status"></div>
+    <main role="main" class="container">
+        <div class="btn-group right-aligned" role="group" aria-label="Settings management">
+            <button id="importSettings" type="button" aria-describedby="import-help">
+                Import Settings
+            </button>
+            <button id="exportSettings" type="button" aria-describedby="export-help">
+                Export Settings
+            </button>
+            <input type="file" id="importFile" accept=".json" style="display: none" 
+                   aria-label="Select settings file to import">
+            <div id="import-help" class="sr-only">Import settings from a JSON file</div>
+            <div id="export-help" class="sr-only">Export current settings to a JSON file</div>
         </div>
-    </div>
+
+        <section class="panel" aria-labelledby="settings-title">
+            <h2 id="settings-title" class="panel-title">⚙️ Settings</h2>
+            
+            <form id="settingsForm" novalidate>
+                <fieldset>
+                    <legend class="sr-only">API Configuration</legend>
+                    
+                    <div class="form-group">
+                        <label for="FW-apiKey">
+                            Firework API Key
+                            <span class="required" aria-label="required">*</span>
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" id="FW-apiKey" 
+                                   placeholder="Enter your Firework API key"
+                                   aria-describedby="fw-key-help"
+                                   required>
+                            <button type="button" class="toggle-password" 
+                                    aria-label="Toggle password visibility"
+                                    tabindex="0">👁️</button>
+                        </div>
+                        <div id="fw-key-help" class="help-text">
+                            Required for audio transcription using Whisper models
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="FW-model">Firework Model</label>
+                        <input type="text" id="FW-model" 
+                               placeholder="e.g., whisper-v3-turbo"
+                               aria-describedby="fw-model-help">
+                        <div id="fw-model-help" class="help-text">
+                            Specify the Whisper model to use for transcription
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="FW-apiUrl">Firework API URL</label>
+                        <input type="url" id="FW-apiUrl" 
+                               value="https://audio-turbo.us-virginia-1.direct.fireworks.ai/v1"
+                               aria-describedby="fw-url-help">
+                        <div id="fw-url-help" class="help-text">
+                            Base URL for the Firework API endpoint
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Opn-apiKey">
+                            OpenAI Compatible API Key
+                            <span class="required" aria-label="required">*</span>
+                        </label>
+                        <div class="password-wrapper">
+                            <input type="password" id="Opn-apiKey" 
+                                   placeholder="Enter your AI API key"
+                                   aria-describedby="opn-key-help"
+                                   required>
+                            <button type="button" class="toggle-password" 
+                                    aria-label="Toggle password visibility"
+                                    tabindex="0">👁️</button>
+                        </div>
+                        <div id="opn-key-help" class="help-text">
+                            Required for AI text processing (OpenRouter, OpenAI, etc.)
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Opn-model">OpenAI Compatible Model</label>
+                        <input type="text" id="Opn-model" 
+                               placeholder="e.g., google/gemini-2.5-flash"
+                               aria-describedby="opn-model-help">
+                        <div id="opn-model-help" class="help-text">
+                            AI model for text processing tasks
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="Opn-apiUrl">OpenAI Compatible API URL</label>
+                        <input type="url" id="Opn-apiUrl" 
+                               value="https://openrouter.ai/api/v1"
+                               aria-describedby="opn-url-help">
+                        <div id="opn-url-help" class="help-text">
+                            Base URL for the OpenAI compatible API
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>Transcription Preferences</legend>
+                    
+                    <div class="form-group">
+                        <label for="language">Language</label>
+                        <select id="language" aria-describedby="language-help">
+                            <option value="auto">Auto Detect</option>
+                            <option value="en">English</option>
+                            <option value="zh">Chinese</option>
+                            <option value="id">Indonesian</option>
+                            <option value="ms">Malay</option>
+                            <option value="th">Thai</option>
+                            <option value="vi">Vietnamese</option>
+                            <option value="ja">Japanese</option>
+                            <option value="ko">Korean</option>
+                            <option value="yue">Cantonese</option>
+                            <option value="es">Spanish</option>
+                            <option value="fr">French</option>
+                        </select>
+                        <div id="language-help" class="help-text">
+                            Default language for audio transcription
+                        </div>
+                    </div>
+
+                    <div class="checkbox-wrapper">
+                        <input type="checkbox" id="diarize" aria-describedby="diarize-help">
+                        <label for="diarize">Speaker Diarization</label>
+                        <div id="diarize-help" class="help-text">
+                            Identify and separate different speakers in the audio
+                        </div>
+                    </div>
+                </fieldset>
+
+                <fieldset>
+                    <legend>AI Processing Prompts</legend>
+                    
+                    <div class="form-group">
+                        <label for="proofread">Proofread Prompt</label>
+                        <textarea id="proofread" rows="3" 
+                                  placeholder="Enter proofread prompt"
+                                  aria-describedby="proofread-help">Proofread and correct this text. Fix grammar, punctuation, and spelling. Keep the meaning the same. Make it clear, concise, and coherent.</textarea>
+                        <div id="proofread-help" class="help-text">
+                            Instructions for AI when proofreading transcribed text
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="minutes">Minutes Prompt</label>
+                        <textarea id="minutes" rows="3" 
+                                  placeholder="Enter minutes prompt"
+                                  aria-describedby="minutes-help">Convert the transcript into meeting minutes. Structure the minutes with a clear agenda, discussion points, decisions, and action items. Use bullet points.</textarea>
+                        <div id="minutes-help" class="help-text">
+                            Instructions for AI when creating meeting minutes
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="summary">Summary Prompt</label>
+                        <textarea id="summary" rows="3" 
+                                  placeholder="Enter summary prompt"
+                                  aria-describedby="summary-help">Summarize the transcript. Capture the main points, key arguments, and conclusions. Keep it brief and to the point.</textarea>
+                        <div id="summary-help" class="help-text">
+                            Instructions for AI when summarizing text
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="outline">Outline Prompt</label>
+                        <textarea id="outline" rows="3" 
+                                  placeholder="Enter outline prompt"
+                                  aria-describedby="outline-help">Create a structured outline from the transcript. Break down the content into sections, subsections, and bullet points. Include headings and subheadings.</textarea>
+                        <div id="outline-help" class="help-text">
+                            Instructions for AI when creating outlines
+                        </div>
+                    </div>
+                </fieldset>
+
+                <div class="form-actions">
+                    <button type="submit" id="saveSettings" class="primary-button">
+                        Save Settings
+                    </button>
+                </div>
+            </form>
+
+            <div id="settingsStatus" class="status" role="status" aria-live="polite"></div>
+        </section>
+    </main>
     
-    <footer>
-        <p>Audio Transcription & AI Processor PWA | All processing happens securely</p>
+    <footer role="contentinfo">
+        <p>Audio Transcription & AI Processor | All processing happens securely</p>
     </footer>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const elements = {
-                'FW-apiKey': document.getElementById('FW-apiKey'),
-                'FW-model': document.getElementById('FW-model'),
-                'FW-apiUrl': document.getElementById('FW-apiUrl'),
-                'Opn-apiKey': document.getElementById('Opn-apiKey'),
-                'Opn-model': document.getElementById('Opn-model'),
-                'Opn-apiUrl': document.getElementById('Opn-apiUrl'),
-                'saveSettings': document.getElementById('saveSettings'),
-                'settingsStatus': document.getElementById('settingsStatus'),
-                'language': document.getElementById('language'),
-                'diarize': document.getElementById('diarize'),
-                'proofread': document.getElementById('proofread'),
-                'minutes': document.getElementById('minutes'),
-                'summary': document.getElementById('summary'),
-                'outline': document.getElementById('outline')
-            };
-
-            function loadSettings() {
-                const settings = JSON.parse(localStorage.getItem('transcriberSettings') || '{}');
-                elements['FW-apiKey'].value = settings['FW-apiKey'] || '';
-                elements['FW-model'].value = settings['FW-model'] || 'whisper-v3-turbo';
-                elements['FW-apiUrl'].value = settings['FW-apiUrl'] || 'https://audio-turbo.us-virginia-1.direct.fireworks.ai/v1';
-                elements['Opn-apiKey'].value = settings['Opn-apiKey'] || '';
-                elements['Opn-model'].value = settings['Opn-model'] || 'google/gemini-2.5-flash';
-                elements['Opn-apiUrl'].value = settings['Opn-apiUrl'] || 'https://openrouter.ai/api/v1';
-                elements['language'].value = settings['language'] || 'auto';
-                elements['diarize'].checked = settings['diarize'] || false;
-                elements['proofread'].value = settings['proofread'] || "Proofread and correct this text. Fix grammar, punctuation, and spelling. Keep the meaning the same. Make it clear, concise, and coherent.";
-                elements['minutes'].value = settings['minutes'] || "Convert the transcript into meeting minutes. Structure the minutes with a clear agenda, discussion points, decisions, and action items. Use bullet points.";
-                elements['summary'].value = settings['summary'] || "Summarize the transcript. Capture the main points, key arguments, and conclusions. Keep it brief and to the point.";
-                elements['outline'].value = settings['outline'] || "Create a structured outline from the transcript. Break down the content into sections, subsections, and bullet points. Include headings and subheadings.";
-            }
-
-            function saveSettings() {
-                const settings = {
-                    'FW-apiKey': elements['FW-apiKey'].value,
-                    'FW-model': elements['FW-model'].value,
-                    'FW-apiUrl': elements['FW-apiUrl'].value,
-                    'Opn-apiKey': elements['Opn-apiKey'].value,
-                    'Opn-model': elements['Opn-model'].value,
-                    'Opn-apiUrl': elements['Opn-apiUrl'].value,
-                    'language': elements['language'].value,
-                    'diarize': elements['diarize'].checked,
-                    'proofread': elements['proofread'].value,
-                    'minutes': elements['minutes'].value,
-                    'summary': elements['summary'].value,
-                    'outline': elements['outline'].value
-                };
-                localStorage.setItem('transcriberSettings', JSON.stringify(settings));
-                showStatus(elements.settingsStatus, 'Settings saved successfully!', 'success');
-            }
-
-            function showStatus(element, message, type) {
-                element.textContent = message;
-                element.className = `status ${type}`;
-                setTimeout(() => {
-                    element.textContent = '';
-                    element.className = 'status';
-                }, 5000);
-            }
-
-            function setupEventListeners() {
-                elements.saveSettings.addEventListener('click', saveSettings);
-                document.querySelectorAll('.toggle-password').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const input = btn.previousElementSibling;
-                        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-                        input.setAttribute('type', type);
-                        btn.textContent = type === 'password' ? '👁️' : '🙈';
-                    });
-                });
-            }
-
-            // Export settings to JSON file
-            function exportSettings() {
-                const settings = JSON.parse(localStorage.getItem('transcriberSettings') || '{}');
-                const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(settings, null, 2));
-                const downloadAnchor = document.createElement('a');
-                downloadAnchor.setAttribute("href", dataStr);
-                downloadAnchor.setAttribute("download", "transcriber-settings.json");
-                document.body.appendChild(downloadAnchor);
-                downloadAnchor.click();
-                downloadAnchor.remove();
-                showStatus(elements.settingsStatus, 'Settings exported successfully!', 'success');
-            }
-
-            // Import settings from JSON file
-            function importSettings() {
-                document.getElementById('importFile').click();
-            }
-
-            // Handle imported file
-            function handleFileImport(event) {
-                const file = event.target.files[0];
-                if (!file) return;
-                
-                const reader = new FileReader();
-                reader.onload = function(e) {
-                    try {
-                        const settings = JSON.parse(e.target.result);
-                        localStorage.setItem('transcriberSettings', JSON.stringify(settings));
-                        loadSettings();
-                        showStatus(elements.settingsStatus, 'Settings imported successfully!', 'success');
-                    } catch (error) {
-                        showStatus(elements.settingsStatus, 'Error: Invalid settings file', 'error');
-                    }
-                };
-                reader.readAsText(file);
-                event.target.value = ''; // Reset input
-            }
-
-            function setupEventListeners() {
-                elements.saveSettings.addEventListener('click', saveSettings);
-                document.getElementById('exportSettings').addEventListener('click', exportSettings);
-                document.getElementById('importSettings').addEventListener('click', importSettings);
-                document.getElementById('importFile').addEventListener('change', handleFileImport);
-                document.querySelectorAll('.toggle-password').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        const input = btn.previousElementSibling;
-                        const type = input.getAttribute('type') === 'password' ? 'text' : 'password';
-                        input.setAttribute('type', type);
-                        btn.textContent = type === 'password' ? '👁️' : '🙈';
-                    });
-                });
-            }
-
-            loadSettings();
-            setupEventListeners();
-        });
-    </script>
+    <script src="settings.js"></script>
 </body>
 </html>
