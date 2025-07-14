@@ -331,7 +331,7 @@ async function processText(action) {
             outline: "Create a structured outline from the transcript. Break down the content into sections, subsections, and bullet points. Include headings and subheadings."
         };
         
-        const promptText = settings[action] || defaultPrompts[action];
+        const promptText = "You are a helpful assistant that help with writing. Ensure you follow the language of the original text (example if Chinese language you return Chinese, if English return English). " + settings[action] || defaultPrompts[action];
         
         const response = await fetch(settings['Opn-apiUrl'] + "/chat/completions", {
             method: 'POST',
