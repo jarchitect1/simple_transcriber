@@ -3,7 +3,6 @@
  * Main application JavaScript file
  */
 
-console.log('DEBUG: Script started loading');
 
 // Application state and configuration
 const AppConfig = {
@@ -17,7 +16,6 @@ const elements = {};
 
 // Application initialization
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DEBUG: DOM Content Loaded');
     
     // Initialize DOM elements cache
     initializeElements();
@@ -36,7 +34,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Update initial button states
     updateButtonStates();
     
-    console.log('DEBUG: Script initialization completed');
 });
 
 /**

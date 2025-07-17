@@ -3,7 +3,6 @@
  * Handles configuration management for the Audio Transcription & AI Processor PWA
  */
 
-console.log('DEBUG: Settings script started loading');
 
 // Application configuration
 const SettingsConfig = {
@@ -29,7 +28,6 @@ const elements = {};
 
 // Application initialization
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('DEBUG: Settings DOM Content Loaded');
     
     // Initialize DOM elements cache
     initializeElements();
@@ -43,7 +41,6 @@ document.addEventListener('DOMContentLoaded', () => {
     // Setup form validation
     setupFormValidation();
     
-    console.log('DEBUG: Settings initialization completed');
 });
 
 /**
@@ -96,7 +93,6 @@ function loadSettings() {
             elements['Opn-apiKey'].value = settings['Opn-apiKey'] || '';
         }
         
-        console.log('DEBUG: Settings loaded successfully');
     } catch (error) {
         console.error('Error loading settings:', error);
         showStatus('Error loading settings. Using defaults.', 'error');
@@ -143,7 +139,6 @@ function saveSettings(event) {
         localStorage.setItem(SettingsConfig.STORAGE_KEY, JSON.stringify(settings));
         
         showStatus('Settings saved successfully!', 'success');
-        console.log('DEBUG: Settings saved successfully');
         
     } catch (error) {
         console.error('Error saving settings:', error);
@@ -235,7 +230,6 @@ function exportSettings() {
         document.body.removeChild(downloadAnchor);
         
         showStatus('Settings exported successfully!', 'success');
-        console.log('DEBUG: Settings exported');
         
     } catch (error) {
         console.error('Error exporting settings:', error);
@@ -282,7 +276,6 @@ function handleFileImport(event) {
             loadSettings();
             
             showStatus('Settings imported successfully!', 'success');
-            console.log('DEBUG: Settings imported');
             
         } catch (error) {
             console.error('Error importing settings:', error);
@@ -452,7 +445,6 @@ function resetToDefaults() {
             loadSettings();
             
             showStatus('Settings reset to defaults.', 'success');
-            console.log('DEBUG: Settings reset to defaults');
             
         } catch (error) {
             console.error('Error resetting settings:', error);

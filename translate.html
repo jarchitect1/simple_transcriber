@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document Translation</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+    <link rel="icon" type="image/png" sizes="512x512" href="icon-512.png">
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.7/quill.js"></script>
+</head>
+<body>
+    <!-- Header Section -->
+    <header role="banner">
+        <h1>Document Translation</h1>
+        <nav role="navigation" aria-label="Main navigation">
+            <a href="index.html" aria-label="Go to home page">Home</a>
+            <a href="settings.html" aria-label="Go to settings page">Settings</a>
+            <a href="about.html" aria-label="Go to about page">About</a>
+        </nav>
+    </header>
+    
+    <!-- Main Content -->
+    <main role="main" class="container">
+        <section class="panel" aria-labelledby="translation-title">
+            <h2 id="translation-title" class="panel-title">
+                <span aria-hidden="true">🌐</span>
+                Document Translation
+            </h2>
+            
+            <!-- Source Text Input -->
+            <div class="form-group">
+                <!-- DOCX File Upload -->
+                <div class="file-upload-group">
+                    <label for="docxUpload">Upload DOCX File</label>
+                    <input type="file" id="docxUpload" accept=".docx" aria-describedby="docx-help">
+                    <button id="uploadDocxBtn" type="button">Upload and Append</button> 
+                    Upload a .docx file to append its content to the text area.
+                </div>
+                <br>
+                <!-- Text Area for Manual Input -->
+                <label for="sourceText">Text to Translate</label>
+                <textarea id="sourceText" placeholder="Enter text to translate or paste content here..." rows="8"></textarea>
+            </div>
+            
+            <div class="form-group">
+                <label for="language">Target Language</label>
+                <select id="language" aria-describedby="language-help">
+                    <option value="" disabled selected>Select a language</option>
+                    <option value="en">English</option>
+                    <option value="zh">Chinese</option>
+                    <option value="id">Indonesian</option>
+                    <option value="ms">Malay</option>
+                    <option value="th">Thai</option>
+                    <option value="vi">Vietnamese</option>
+                    <option value="ja">Japanese</option>
+                    <option value="ko">Korean</option>
+                    <option value="yue">Cantonese</option>
+                    <option value="es">Spanish</option>
+                    <option value="fr">French</option>
+                </select>
+                <div id="language-help" class="sr-only">
+                    Select the language to translate to.
+                </div>
+            </div>
+            
+            <!-- Translate Button -->
+            <button id="translateBtn" type="button" aria-describedby="translate-status">
+                Translate Text
+            </button>
+            
+            <!-- Status Display -->
+            <div id="translateStatus" class="status" role="status" aria-live="polite"></div>
+            
+            <!-- Translation Output -->
+            <div class="form-group">
+                <label for="translationResultEditor">Translated Text</label>
+                <div id="translationResultEditor" style="height: 200px;"></div>
+            </div>
+            
+            <!-- Action Buttons -->
+            <div class="button-group">
+                <button id="copyTranslation">Copy Translation</button>
+                <button id="downloadTranslation">Download as DOCX</button>
+            </div>
+            
+            <!-- Progress Bar -->
+            <div id="translationProgress" class="progress-container" hidden>
+                <div class="progress-bar" id="progressBar"></div>
+                <div class="progress-text" id="progressText">0%</div>
+            </div>
+        </section>
+    </main>
+    
+    <!-- Footer -->
+    <footer role="contentinfo">
+        <p>Document Translation | All processing happens securely</p>
+    </footer>
+    
+    <!-- JavaScript -->
+    <script src="https://cdn.jsdelivr.net/npm/docx@8.5.0/build/index.umd.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/mammoth@1.4.2/mammoth.browser.min.js"></script>
+    <script src="translate.js"></script>
+</body>
+</html>
